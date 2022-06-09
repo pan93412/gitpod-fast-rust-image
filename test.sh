@@ -12,19 +12,19 @@ if [ ! "$1" == "--skip-build" ]; then
 fi
 
 output "Testing:  mold"
-docker run -it --rm "$IMAGE_NAME" mold -V || exit $?
+docker run --rm "$IMAGE_NAME" mold -V || exit $?
 
 output "Testing:  cargo udeps"
-docker run -it --rm "$IMAGE_NAME" cargo udeps -h || exit $?
+docker run --rm "$IMAGE_NAME" cargo udeps -h || exit $?
 
 output "Testing:  sccache"
-docker run -it --rm "$IMAGE_NAME" sccache -V || exit $?
+docker run --rm "$IMAGE_NAME" sccache -V || exit $?
 
 output "Testing:  cargo config - config.toml"
-docker run -it --rm "$IMAGE_NAME" cat /home/gitpod/.cargo/config.toml || exit $?
+docker run --rm "$IMAGE_NAME" cat /home/gitpod/.cargo/config.toml || exit $?
 
 output "Testing:  cargo config - bashrc.d"
-docker run -it --rm "$IMAGE_NAME" cat /home/gitpod/.bashrc.d/81-cargo-config || exit $?
+docker run --rm "$IMAGE_NAME" cat /home/gitpod/.bashrc.d/81-cargo-config || exit $?
 
 output "Testing:  /bin/sh -> /bin/bash"
-docker run -it --rm "$IMAGE_NAME" ls -al /bin/sh || exit $?
+docker run --rm "$IMAGE_NAME" ls -al /bin/sh || exit $?
