@@ -8,6 +8,9 @@ on:
       - '*'
   workflow_dispatch:
 
+env:
+  TEST_TAG: pan93412/gitpod-fast-rust-image:staging-local
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -23,6 +26,7 @@ jobs:
           images: |
             pan93412/gitpod-fast-rust-image
           tags: |
+            latest
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
@@ -39,6 +43,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build image for testing
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          load: true
+          tags: ${{ env.TEST_TAG }}
+      -
+        name: Run tests
+        run: bash test.sh --skip-build
       -
         name: Build and push
         uses: docker/build-push-action@v3
