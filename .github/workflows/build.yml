@@ -50,6 +50,8 @@ jobs:
           context: .
           load: true
           tags: ${{ env.TEST_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       -
         name: Run tests
         run: bash test.sh --skip-build
