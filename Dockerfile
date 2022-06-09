@@ -11,6 +11,10 @@ RUN bash build.sh
 ## Merge artifacts.
 FROM gitpod/workspace-full
 
+LABEL org.opencontainers.image.title="The speed-optimized and feature-rich Rust Docker image for Gitpod."
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.url="https://github.com/pan93412/gitpod-fast-rust-image"
+
 # Copy the intermediates from the above stages.
 COPY --from=mold-stage /tmp/gitpod-mold-rust-image /tmp/gitpod-mold-rust-image
 COPY --from=cargo-install-stage /tmp/cargo-pkgs /tmp/cargo-pkgs
