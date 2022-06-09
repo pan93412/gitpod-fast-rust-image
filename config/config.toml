@@ -3,4 +3,4 @@ linker = "clang"
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]
 
 [build]
-rustc-wrapper = "/workspace/.cargo/bin/sccache"
+rustc-wrapper = "/home/gitpod/.cargo/bin/sccache"

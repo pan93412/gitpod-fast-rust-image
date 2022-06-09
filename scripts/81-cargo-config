@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+
+# Copy configuration from ~/.cargo to $CARGO_HOME
+if [ ! -f "$CARGO_HOME/config.toml" ]; then
+    cp /home/gitpod/.cargo/config.toml "$CARGO_HOME"
+fi

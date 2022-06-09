@@ -1,40 +1,49 @@
 ## Build mold
 FROM gitpod/workspace-c AS mold-stage
-COPY ./scripts/mold/common.sh ./scripts/mold/build.sh ./
-RUN bash build.sh
+USER gitpod
 
-## Build packages installed with `cargo install`
+ENV mold_version=v1.2.1
+
+# Clone mold's repo.
+RUN git clone --depth=1 --branch="${mold_version}" https://github.com/rui314/mold.git /tmp/mold
+WORKDIR /tmp/mold
+
+# Install dependencies.
+RUN sudo ./install-build-deps.sh
+
+# Build mold.
+RUN make -j"$(nproc)" CXX=clang++
+
+# Install mold to a temporary path.
+USER gitpod
+RUN mkdir -p /tmp/mold-bin && make install PREFIX=/tmp/mold-bin
+
+
+## Install utilities with cargo install.
 FROM gitpod/workspace-rust AS cargo-install-stage
-COPY ./scripts/cargo-install/build.sh ./
-RUN bash build.sh
+USER gitpod
+RUN cargo install --root=/tmp/cargo-bin sccache cargo-udeps
 
-## Merge artifacts.
+
+## Merge artifacts and build the final image.
 FROM gitpod/workspace-full
 
 LABEL org.opencontainers.image.title="The speed-optimized and feature-rich Rust Docker image for Gitpod."
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.url="https://github.com/pan93412/gitpod-fast-rust-image"
 
-# Copy the intermediates from the above stages.
-COPY --from=mold-stage /tmp/gitpod-mold-rust-image /tmp/gitpod-mold-rust-image
-COPY --from=cargo-install-stage /tmp/cargo-pkgs /tmp/cargo-pkgs
+USER gitpod
 
-# Copy the scripts from our repo.
-COPY ./scripts/mold/common.sh   \
-     ./scripts/mold/install.sh  \
-     ./scripts/mold/clean.sh    \
-     ./mold/
-COPY ./scripts/cargo-install/install.sh ./cargo-install/
-COPY ./scripts/bind-sh-to-bash/install.sh ./bind-sh-to-bash/
+# Bind sh to bash
+RUN sudo ln -fs /bin/bash /bin/sh
 
-# Run installation scripts
-RUN \
-    bash ./mold/install.sh && bash ./mold/clean.sh && \
-    bash ./cargo-install/install.sh && \
-    bash ./bind-sh-to-bash/install.sh
+# Copy Cargo configuration to this image,
+# and initiate this configuration when starting bash.
+COPY ./config/config.toml /home/gitpod/.cargo/config.toml
+COPY ./scripts/81-cargo-config /home/gitpod/.bashrc.d/
 
-# Clean up
-RUN sudo rm -rf ./mold/ ./cargo-install/ ./bind-sh-to-bash/
+# Copy the prebuilt mold to /usr/local/bin
+COPY --from=mold-stage /tmp/mold /usr/local/bin
 
-# Copy Cargo configuration to this image
-COPY ./config/config.toml /workspace/.cargo/config.toml
+# Copy the prebuilt sccache & cargo-udeps to ~/.cargo/bin
+COPY --from=cargo-install-stage /tmp/cargo-bin /home/gitpod/.cargo/
