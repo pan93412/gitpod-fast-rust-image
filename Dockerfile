@@ -42,8 +42,8 @@ RUN sudo ln -fs /bin/bash /bin/sh
 COPY ./config/config.toml /home/gitpod/.cargo/config.toml
 COPY ./scripts/81-cargo-config /home/gitpod/.bashrc.d/
 
-# Copy the prebuilt mold to /usr/local/bin
-COPY --from=mold-stage /tmp/mold /usr/local/bin
+# Copy the prebuilt mold to /usr/local/
+COPY --from=mold-stage /tmp/mold-bin /usr/local/
 
 # Copy the prebuilt sccache & cargo-udeps to ~/.cargo/bin
 COPY --from=cargo-install-stage /tmp/cargo-bin /home/gitpod/.cargo/
