@@ -1,0 +1,16 @@
+vscode:
+  extensions:
+    # Docker
+    - "ms-azuretools.vscode-docker"
+
+    # Git
+    - "donjayamanne.githistory"
+    - "eamodio.gitlens"
+    - "mhutchie.git-graph"
+
+    # Bash
+    - "lizebang.bash-extension-pack"
+
+    # Toml
+    - "bungcip.better-toml"
+    - "tamasfe.even-better-toml"
