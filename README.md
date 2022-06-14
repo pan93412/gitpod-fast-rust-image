@@ -1,7 +1,5 @@
 # gitpod-fast-rust-image
 
-> WIP: according to our E2E, it can't work currently.
-
 The speed-optimized and feature-rich Rust Docker image for Gitpod.
 
 ## Features
