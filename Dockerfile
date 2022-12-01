@@ -2,7 +2,7 @@
 FROM gitpod/workspace-c:2022-11-15-17-00-18 AS mold-stage
 USER gitpod
 
-ENV mold_version=v1.4.1
+ENV mold_version=v1.7.1
 
 # Clone mold's repo.
 RUN git clone --depth=1 --branch="${mold_version}" https://github.com/rui314/mold.git /tmp/mold
