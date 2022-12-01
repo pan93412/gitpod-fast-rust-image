@@ -6,16 +6,18 @@ ENV mold_version=v1.7.1
 
 # Clone mold's repo.
 RUN git clone --depth=1 --branch="${mold_version}" https://github.com/rui314/mold.git /tmp/mold
-WORKDIR /tmp/mold
+WORKDIR /tmp/mold/build
 
 # Install dependencies.
-RUN sudo ./install-build-deps.sh
+RUN sudo ../install-build-deps.sh
 
 # Build mold.
-RUN make -j"$(nproc)" CXX=clang++
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ ..
+RUN cmake --build . -j $(nproc)
+RUN sudo cmake --install .
 
 # Install mold to a temporary path.
-RUN mkdir -p /tmp/mold-bin && make install PREFIX=/tmp/mold-bin
+RUN mkdir -p /tmp/mold-bin && sudo cmake --install . --prefix /tmp/mold-bin
 
 
 ## Install utilities with cargo install.
