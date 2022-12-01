@@ -5,8 +5,10 @@ The speed-optimized and feature-rich Rust Docker image for Gitpod.
 ## Features
 
 - Use `mold` as the default linker and integrated `sccache` to speed up the compilation
-- Pre-installed `cargo-workspace`, and `cargo-udeps`
+- Pre-installed `cargo-workspace`, `cargo-udeps` and `neovim`.
 - Bind `/bin/sh` to `/bin/bash` to make `NAPI-RS` and some scripts work correctly.
+- With Rust nightly toolchain pre-installed.
+- Dependencies are upgraded.
 
 ## Usage
 
