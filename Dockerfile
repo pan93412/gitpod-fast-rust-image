@@ -27,6 +27,9 @@ RUN cargo install --root=/tmp/cargo-bin sccache cargo-udeps
 ## Merge artifacts and build the final image.
 FROM gitpod/workspace-full:2022-11-15-17-00-18
 
+ENV rust_nightly_date "2022-11-30"
+ENV rust_version "nightly-${rust_nightly_date}"
+
 LABEL org.opencontainers.image.title="The speed-optimized and feature-rich Rust Docker image for Gitpod."
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.url="https://github.com/pan93412/gitpod-fast-rust-image"
@@ -40,6 +43,11 @@ RUN sudo ln -fs /bin/bash /bin/sh
 RUN sudo apt update && \
     sudo apt upgrade -y &&  \
     sudo apt clean
+
+# Install Rust nightly
+RUN rustup self update && \
+    rustup install ${rust_version} && \
+    rustup default ${rust_version}
 
 # Copy Cargo configuration to this image,
 # and initiate this configuration when starting bash.
