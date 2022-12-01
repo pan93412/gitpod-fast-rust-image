@@ -41,6 +41,9 @@ USER gitpod
 # Bind sh to bash
 RUN sudo ln -fs /bin/bash /bin/sh
 
+# Install nvim
+RUN sudo install-packages neovim
+
 # Update Image
 RUN sudo apt update && \
     sudo apt upgrade -y &&  \
