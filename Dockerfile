@@ -36,6 +36,11 @@ USER gitpod
 # Bind sh to bash
 RUN sudo ln -fs /bin/bash /bin/sh
 
+# Update Image
+RUN sudo apt update && \
+    sudo apt upgrade -y &&  \
+    sudo apt clean
+
 # Copy Cargo configuration to this image,
 # and initiate this configuration when starting bash.
 COPY ./config/config.toml /home/gitpod/.cargo/config.toml
