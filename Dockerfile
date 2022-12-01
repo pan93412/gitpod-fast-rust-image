@@ -1,5 +1,5 @@
 ## Build mold
-FROM gitpod/workspace-c:2022-08-26-10-53-43 AS mold-stage
+FROM gitpod/workspace-c:2022-11-15-17-00-18 AS mold-stage
 USER gitpod
 
 ENV mold_version=v1.4.1
@@ -19,13 +19,13 @@ RUN mkdir -p /tmp/mold-bin && make install PREFIX=/tmp/mold-bin
 
 
 ## Install utilities with cargo install.
-FROM gitpod/workspace-rust:2022-08-26-10-53-43 AS cargo-install-stage
+FROM gitpod/workspace-rust:2022-11-15-17-00-18 AS cargo-install-stage
 USER gitpod
 RUN cargo install --root=/tmp/cargo-bin sccache cargo-udeps
 
 
 ## Merge artifacts and build the final image.
-FROM gitpod/workspace-full:2022-08-26-10-53-43
+FROM gitpod/workspace-full:2022-11-15-17-00-18
 
 LABEL org.opencontainers.image.title="The speed-optimized and feature-rich Rust Docker image for Gitpod."
 LABEL org.opencontainers.image.licenses="Apache-2.0"
