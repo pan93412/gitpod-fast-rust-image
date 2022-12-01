@@ -28,3 +28,6 @@ docker run --rm "$IMAGE_NAME" cat /home/gitpod/.bashrc.d/81-cargo-config || exit
 
 output "Testing:  /bin/sh -> /bin/bash"
 docker run --rm "$IMAGE_NAME" ls -al /bin/sh || exit $?
+
+output "Testing:  Neovim"
+docker run --rm "$IMAGE_NAME" nvim --version || exit $?
