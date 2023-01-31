@@ -1,36 +1,43 @@
 ## Build mold
-FROM gitpod/workspace-c:2023-01-16-03-31-28 AS mold-stage
+FROM gitpod/workspace-c:latest AS mold-stage
 USER gitpod
 
-ENV mold_version=v1.10.1
+ENV mold_version=1.10.1
+ENV mold_artifact_name=mold-${mold_version}-x86_64-linux
+ENV mold_artifact_file=${mold_artifact_name}.tar.gz
 
-# Clone mold's repo.
-RUN git clone --depth=1 --branch="${mold_version}" https://github.com/rui314/mold.git /tmp/mold
-WORKDIR /tmp/mold/build
+# Download prebuilt files.
+WORKDIR /tmp/mold
+ADD https://github.com/rui314/mold/releases/download/v${mold_version}/${mold_artifact_file} .
 
-# Install dependencies.
-RUN sudo ../install-build-deps.sh
-
-# Build mold.
-RUN cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ ..
-RUN cmake --build . -j $(nproc)
-RUN sudo cmake --install .
-
-# Install mold to a temporary path.
-RUN mkdir -p /tmp/mold-bin && sudo cmake --install . --prefix /tmp/mold-bin
-
+# Decompress the tar file and move file contents to /tmp/mold-bin
+RUN sudo chown gitpod:gitpod "${mold_artifact_file}" && tar -xzvf "${mold_artifact_file}" && mv "${mold_artifact_name}" /tmp/mold-bin
 
 ## Install utilities with cargo install.
-FROM gitpod/workspace-rust:2023-01-16-03-31-28 AS cargo-install-stage
+FROM gitpod/workspace-rust:latest AS cargo-install-stage
 USER gitpod
-RUN cargo install --root=/tmp/cargo-bin sccache cargo-udeps
 
+WORKDIR /tmp/cargo-bin
+
+ADD https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz binstall.tgz
+
+# Prepare cargo-binstall
+RUN sudo chown gitpod:gitpod binstall.tgz && tar -xvf binstall.tgz && rm binstall.tgz
+
+# Install sccache, cargo-udeps & cargo-nextest
+RUN cargo install --root /tmp/cargo-bin --no-default-features sccache
+
+RUN ./cargo-binstall -y --roots /tmp/cargo-bin \
+        cargo-udeps \
+        cargo-nextest \
+        cargo-chef \
+        cargo-diet \
+        cargo-sort \
+        hyperfine \
+        cargo-binstall
 
 ## Merge artifacts and build the final image.
-FROM gitpod/workspace-full:2023-01-16-03-31-28
-
-ENV rust_nightly_date "2023-01-31"
-ENV rust_version "nightly-${rust_nightly_date}"
+FROM gitpod/workspace-full:latest
 
 LABEL org.opencontainers.image.title="The speed-optimized and feature-rich Rust Docker image for Gitpod."
 LABEL org.opencontainers.image.licenses="Apache-2.0"
@@ -41,18 +48,17 @@ USER gitpod
 # Bind sh to bash
 RUN sudo ln -fs /bin/bash /bin/sh
 
-# Install nvim
-RUN sudo install-packages neovim
-
-# Update Image
-RUN sudo apt update && \
-    sudo apt upgrade -y &&  \
-    sudo apt clean
+# Install apt-fast, nvim and update images
+RUN /bin/bash -c "$(curl -sL https://git.io/vokNn)" && \
+    sudo apt update && \
+    sudo apt-fast install -y neovim && \
+    sudo apt-fast upgrade -y &&  \
+    sudo rm -rf /var/lib/apt/lists/*
 
 # Install Rust nightly
 RUN rustup self update && \
-    rustup install ${rust_version} && \
-    rustup default ${rust_version}
+    rustup install nightly && \
+    rustup default nightly
 
 # Copy Cargo configuration to this image,
 # and initiate this configuration when starting bash.

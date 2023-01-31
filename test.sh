@@ -15,10 +15,16 @@ output "Testing:  mold"
 docker run --rm "$IMAGE_NAME" mold -V || exit $?
 
 output "Testing:  cargo udeps"
-docker run --rm "$IMAGE_NAME" cargo udeps -h || exit $?
+docker run --rm "$IMAGE_NAME" cargo udeps -V || exit $?
 
 output "Testing:  sccache"
 docker run --rm "$IMAGE_NAME" sccache -V || exit $?
+
+output "Testing:  cargo nextest"
+docker run --rm "$IMAGE_NAME" cargo nextest --version || exit $?
+
+output "Testing:  cargo binstall"
+docker run --rm "$IMAGE_NAME" cargo binstall -V || exit $?
 
 output "Testing:  cargo config - config.toml"
 docker run --rm "$IMAGE_NAME" cat /home/gitpod/.cargo/config.toml || exit $?
